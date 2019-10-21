@@ -1,7 +1,7 @@
 package com.knowably.service;
 
-import com.knowably.model.Input;
-import com.knowably.model.WebCrawl;
+import com.knowably.domain.Input;
+import com.knowably.domain.WebCrawl;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,18 +16,18 @@ import java.util.List;
 public class WebCrawlerImpl implements WebCrawler {
     private List<String> content;
     private List<WebCrawl> results;
-    private int count=0;
+    private int count = 0;
 
     public WebCrawlerImpl() {
     }
 
-@Override
+    @Override
     public List<WebCrawl> getContent(Input input) {
-        String[] URLs=input.getUrl();
-        count=0;
-    results=new ArrayList<>();
-    while(URLs.length>count){
-        String URL=URLs[count];
+        String[] URLs = input.getUrl();
+        count = 0;
+        results = new ArrayList<>();
+        while (URLs.length > count) {
+            String URL = URLs[count];
             System.out.println(" [" + URL + "]");
             try {
                 Document document = Jsoup.connect(URL).get();
@@ -35,12 +35,12 @@ public class WebCrawlerImpl implements WebCrawler {
                 Elements body = document.select("body");
                 content = new ArrayList<>();
                 for (Element element : body) {
-                    System.out.println(element);
+//                    System.out.println(element);
                     content.add(element.toString());
                 }
                 count++;
-                System.out.println(content.size());
-                WebCrawl webCrawl =new WebCrawl();
+//                System.out.println(content.size());
+                WebCrawl webCrawl = new WebCrawl();
                 webCrawl.setId(input.getId());
                 webCrawl.setConcept(input.getConcept());
                 webCrawl.setDomain(input.getDomain());
@@ -56,6 +56,13 @@ public class WebCrawlerImpl implements WebCrawler {
 
         return results;
     }
+
+/*    @Override
+    @KafkaListener(topics = "TopicLinks",groupId = "services")
+    public void consume(String input) {
+
+        System.out.println("consumed string msg= "+input);
+    }*/
 
 
 }
