@@ -1,0 +1,114 @@
+version: '3.1'
+services:
+  mysql:
+    image: mysql:5.7
+    ports:
+      - 3306:3306
+    container_name: mysql
+    volumes:
+      - $HOME/mysql:/data/db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: demo
+      MYSQL_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+  zookeeper:
+    image: confluent/zookeeper
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    links:
+      - zookeeper:zk
+    environment:
+      KAFKA_CREATE_TOPICS: "TopicPayload:1:1"
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 1
+      KAFKA_MESSAGE_MAX_BYTES: 10000000
+      KAFKA_REPLICA_FETCH_MAX_BYTES: 10000000
+      KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 600000
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DELETE_RETENTION_MS: 1000 ​
+  eureka-server:
+    build: eureka-server/
+    container_name: eureka-server
+    restart: always
+    network_mode: "host"
+    hostname: localhost
+    ports:
+      - 8085:8085
+  config-server:
+    build: config-server/
+    container_name: config-server
+    restart: always
+    network_mode: "host"
+    hostname: localhost
+    ports:
+      - 8888:8888
+  api-gateway:
+    build: api-gateway/
+    container_name: api-gateway
+    depends_on:
+      - config-server
+    restart: always
+    network_mode: "host"
+    hostname: localhost
+    ports:
+      - 8080:8080
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - $HOME/mongo:/data/db
+  spring-user:
+    image: user-demo-service
+    build: User/
+    restart: always
+    container_name: user-service-container
+    depends_on:
+      - mysql
+      - eureka-server
+      - config-server
+      - kafka
+    links:
+      - kafka
+    ports:
+      - 8082:8082
+  track-service:
+    image: track-service
+    build: track-service/
+    restart: always
+    container_name: track-service-container
+    depends_on:
+      - mongo
+      - eureka-server
+      - config-server
+      - kafka
+    links:
+      - kafka
+      - mongo
+    ports:
+      - 8086:8086
+  webcrawler-service:
+    image: webcrawler-service
+    build: webcrawler/
+    restart: always
+    container_name: webcrawler-container
+    depends_on:
+      - kafka
+      - config-server
+      - eureka-server
+    links:
+      - kafka
+    ports:
+      - 8090:8090
+
