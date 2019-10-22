@@ -24,6 +24,8 @@ public class WebCrawlerController {
     private Input input;
     private ResponseEntity responseEntity;
     private String topic="TopicPayload";
+    private String topic2="TopicTest";
+
 
     @Autowired
     KafkaTemplate<String,String> kafkaTemplate;
@@ -68,6 +70,16 @@ public class WebCrawlerController {
             input.setUserId(input1.getUserId());
             input.setUrl(input1.getUrl());
             input.setId(input1.getId());
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String listPayload = mapper.writeValueAsString(input1);
+                //System.out.println("Resulting JSON string = " + json);
+                kafkaTemplate.send(topic2,listPayload);
+                //kafkaTemplate.send(topic,1,"msg=",message);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+
             responseEntity = new ResponseEntity<String>("Uploaded Succesfully",HttpStatus.OK);
         } catch (Exception e)
         {
@@ -77,7 +89,7 @@ public class WebCrawlerController {
     }
 
 
-    @KafkaListener(topics = "TopicLinks",groupId = "services")
+    @KafkaListener(topics ="TopicTest",groupId = "services",containerFactory = "kafkaListenerContainerFactory")
     public void consume(String receivedInput) {
 
         System.out.println("ndjnfjdnfjd");

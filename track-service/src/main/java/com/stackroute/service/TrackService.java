@@ -46,5 +46,5 @@ public interface TrackService {
      */
     public List<Track> getTrackByName(String trackName) throws TrackNotFoundException;
 
-    public void consume(String msg);
+//    public void consume(String msg);
 }

@@ -130,12 +130,14 @@ public class TrackServiceImpl implements TrackService {
         return trackRepository.findBytrackName(trackName);
     }
 
+/*
     @Override
     @KafkaListener(topics = "TopicTest",groupId = "group_id")
     public void consume(String msg) {
 
         System.out.println("consumed string msg= "+msg);
     }
+*/
 
 
 }
