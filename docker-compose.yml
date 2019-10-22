@@ -1,17 +1,17 @@
 version: '3.1'
 services:
-#  mysql:
-#    image: mysql:5.7
-#    ports:
-#      - 3306:3306
-#    container_name: mysql
-#    volumes:
-#      - $HOME/mysql:/data/db
-#    environment:
-#      MYSQL_ROOT_PASSWORD: root
-#      MYSQL_DATABASE: demo
-#      MYSQL_PASSWORD: root
-#      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+  mysql:
+    image: mysql:5.7
+    ports:
+      - 3306:3306
+    container_name: mysql
+    volumes:
+      - $HOME/mysql:/data/db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: demo
+      MYSQL_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
 
   zookeeper:
     image: wurstmeister/zookeeper
@@ -40,89 +40,70 @@ services:
       KAFKA_NUM_PARTITIONS: 3
       KAFKA_DELETE_RETENTION_MS: 1000 ​
 
-#  kafka:
-#        depends_on:
-#          - zookeeper
-#        environment:
-#          KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://172.17.0.1:9092"
-#          KAFKA_LISTENERS: "PLAINTEXT://172.17.0.1:9092"
-#          KAFKA_ZOOKEEPER_CONNECT: "172.17.0.1:2181"
-#        hostname: 172.17.0.1
-#        image: wurstmeister/kafka
-#        network_mode: host
-#        ports:
-#          - "9092:9092"
-#        restart: always
-#  zookeeper:
-#          hostname: 172.17.0.1
-#          image: wurstmeister/zookeeper
-#          network_mode: host
-#          ports:
-#            - "2181:2181"
-#          restart: always
-#  eureka-server:
-#    build: eureka-server/
-#    container_name: eureka-server
-#    restart: always
-#    network_mode: "host"
-#    hostname: localhost
-#    ports:
-#      - 8085:8085
-#  config-server:
-#    build: config-server/
-#    container_name: config-server
-#    restart: always
-#    network_mode: "host"
-#    hostname: localhost
-#    ports:
-#      - 8888:8888
-#  api-gateway:
-#    build: api-gateway/
-#    container_name: api-gateway
-#    depends_on:
-#      - config-server
-#    restart: always
-#    network_mode: "host"
-#    hostname: localhost
-#    ports:
-#      - 8080:8080
-#  mongo:
-#    image: mongo
-#    container_name: mongo
-#    restart: always
-#    ports:
-#      - 27017:27017
-#    volumes:
-#      - $HOME/mongo:/data/db
-#  spring-user:
-#    image: user-demo-service
-#    build: User/
-#    restart: always
-#    container_name: user-service-container
-#    depends_on:
-#      - mysql
-#      - eureka-server
-#      - config-server
-#      - kafka
-#    links:
-#      - kafka
-#    ports:
-#      - 8082:8082
-#  track-service:
-#    image: track-service
-#    build: track-service/
-#    restart: always
-#    container_name: track-service-container
-#    depends_on:
-#      - mongo
-#      - eureka-server
-#      - config-server
-#      - kafka
-#    links:
-#      - kafka
-#      - mongo
-#    ports:
-#      - 8086:8086
+
+  eureka-server:
+    build: eureka-server/
+    container_name: eureka-server
+    restart: always
+    network_mode: "host"
+    hostname: localhost
+    ports:
+      - 8085:8085
+  config-server:
+    build: config-server/
+    container_name: config-server
+    restart: always
+    network_mode: "host"
+    hostname: localhost
+    ports:
+      - 8888:8888
+  api-gateway:
+    build: api-gateway/
+    container_name: api-gateway
+    depends_on:
+      - config-server
+    restart: always
+    network_mode: "host"
+    hostname: localhost
+    ports:
+      - 8080:8080
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - $HOME/mongo:/data/db
+  spring-user:
+    image: user-demo-service
+    build: User/
+    restart: always
+    container_name: user-service-container
+    depends_on:
+      - mysql
+      - eureka-server
+      - config-server
+      - kafka
+    links:
+      - kafka
+    ports:
+      - 8082:8082
+  track-service:
+    image: track-service
+    build: track-service/
+    restart: always
+    container_name: track-service-container
+    depends_on:
+      - mongo
+      - eureka-server
+      - config-server
+      - kafka
+    links:
+      - kafka
+      - mongo
+    ports:
+      - 8086:8086
   webcrawler-service:
     image: webcrawler-service
     build: webcrawler/
